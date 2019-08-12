@@ -1,8 +1,8 @@
 import app from "@server";
-import supertest from "supertest";
-
-import { BAD_REQUEST, CREATED, OK } from "http-status-codes";
+import supertest from "supertest"; // https://github.com/visionmedia/supertest
 import { Response, SuperTest, Test } from "supertest";
+import { BAD_REQUEST, CREATED, OK } from "http-status-codes";
+
 import { ITodo, Todo } from "@entities";
 import { TodosDao } from "@daos";
 import { pErr, paramMissingError } from "@shared";
@@ -11,8 +11,8 @@ describe("Todos Routes", () => {
   const todosPath = "/api/todos";
   const getTodosPath = `${todosPath}/all`;
   const addTodosPath = `${todosPath}/add`;
-  const updateUserPath = `${todosPath}/update`;
-  const deleteUserPath = `${todosPath}/delete/:id`;
+  const updateTodoPath = `${todosPath}/update`;
+  const deleteTodoPath = `${todosPath}/delete/:id`;
 
   let request: SuperTest<Test>;
 
@@ -22,12 +22,30 @@ describe("Todos Routes", () => {
   });
 
   describe(`"GET:${getTodosPath}"`, () => {
-    it(`should return a JSON object with all the users and a status code of "${OK}" if the
+    it(`should return a JSON object with all the todos and a status code of "${OK}" if the
             request was successful.`, done => {
       const todos = [
-        new Todo({ id: 1, description: "test 1", completed: false }),
-        new Todo({ id: 2, description: "test 2", completed: false }),
-        new Todo({ id: 3, description: "test 3", completed: false })
+        new Todo({
+          id: 1,
+          title: "Test 1",
+          description: "Description of test 1",
+          due_date: new Date(),
+          completed: false
+        }),
+        new Todo({
+          id: 2,
+          title: "Test 2",
+          description: "Description of test 2",
+          due_date: new Date(),
+          completed: false
+        }),
+        new Todo({
+          id: 3,
+          title: "Test 3",
+          description: "Description of test 3",
+          due_date: new Date(),
+          completed: false
+        })
       ];
 
       spyOn(TodosDao.prototype, "getAll").and.returnValue(
@@ -37,11 +55,10 @@ describe("Todos Routes", () => {
       request.get(getTodosPath).end((err: Error, res: Response) => {
         pErr(err);
         expect(res.status).toBe(OK);
-        // Caste instance-objects to 'User' objects
-        const retUsers = res.body.todos.map((todo: ITodo) => {
+        const retTodos = res.body.todos.map((todo: ITodo) => {
           return new Todo(todo);
         });
-        expect(retUsers).toEqual(todos);
+        expect(retTodos).toEqual(todos);
         expect(res.body.error).toBeUndefined();
         done();
       });
@@ -49,7 +66,7 @@ describe("Todos Routes", () => {
 
     it(`should return a JSON object containing an error message and a status code of
             "${BAD_REQUEST}" if the request was unsuccessful.`, done => {
-      const errMsg = "Could not fetch users.";
+      const errMsg = "Could not fetch todos.";
       spyOn(TodosDao.prototype, "getAll").and.throwError(errMsg);
 
       request.get(getTodosPath).end((err: Error, res: Response) => {
@@ -70,7 +87,13 @@ describe("Todos Routes", () => {
     };
 
     const todoData = {
-      todo: new Todo({ id: 4, description: "test 4", completed: false })
+      todo: new Todo({
+        id: 4,
+        title: "Test 4",
+        description: "Description of test 4",
+        due_date: new Date(),
+        completed: false
+      })
     };
 
     it(`should return a status code of "${CREATED}" if the request was successful.`, done => {
@@ -79,7 +102,7 @@ describe("Todos Routes", () => {
       request
         .post(addTodosPath)
         .type("form")
-        .send(todoData) // pick up here
+        .send(todoData)
         .end((err: Error, res: Response) => {
           pErr(err);
           expect(res.status).toBe(CREATED);
@@ -90,7 +113,7 @@ describe("Todos Routes", () => {
 
     it(`should return a JSON object with an error message and a status code of "${BAD_REQUEST}"
             if the request was unsuccessful.`, done => {
-      const errMsg = "Could not add user.";
+      const errMsg = "Could not add todo.";
       spyOn(TodosDao.prototype, "add").and.throwError(errMsg);
 
       callApi(todoData).end((err: Error, res: Response) => {
@@ -102,16 +125,22 @@ describe("Todos Routes", () => {
     });
   });
 
-  describe(`"PUT:${updateUserPath}"`, () => {
+  describe(`"PUT:${updateTodoPath}"`, () => {
     const callApi = (reqBody: object) => {
       return request
-        .put(updateUserPath)
+        .put(updateTodoPath)
         .type("form")
         .send(reqBody);
     };
 
     const todoData = {
-      todo: new Todo({ id: 4, description: "test 4", completed: true })
+      todo: new Todo({
+        id: 4,
+        title: "Test 4",
+        description: "Description of test 4",
+        due_date: new Date(),
+        completed: false
+      })
     };
 
     it(`should return a status code of "${OK}" if the request was successful.`, done => {
@@ -126,7 +155,7 @@ describe("Todos Routes", () => {
     });
 
     it(`should return a JSON object with an error message of "${paramMissingError}" and a
-            status code of "${BAD_REQUEST}" if the user param was missing.`, done => {
+            status code of "${BAD_REQUEST}" if the todo param was missing.`, done => {
       callApi({}).end((err: Error, res: Response) => {
         pErr(err);
         expect(res.status).toBe(BAD_REQUEST);
@@ -136,9 +165,9 @@ describe("Todos Routes", () => {
     });
   });
 
-  describe(`"DELETE:${deleteUserPath}"`, () => {
+  describe(`"DELETE:${deleteTodoPath}"`, () => {
     const callApi = (id: number) => {
-      return request.delete(deleteUserPath.replace(":id", id.toString()));
+      return request.delete(deleteTodoPath.replace(":id", id.toString()));
     };
 
     it(`should return a status code of "${OK}" if the request was successful.`, done => {
