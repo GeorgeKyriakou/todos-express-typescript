@@ -3,7 +3,6 @@ import { Request, Response, Router } from "express";
 import { BAD_REQUEST, CREATED, OK } from "http-status-codes";
 import { paramMissingError } from "@shared";
 
-// Init shared
 const router = Router();
 const todosDao = new TodosDao();
 

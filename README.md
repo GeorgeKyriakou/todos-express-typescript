@@ -2,7 +2,7 @@
 
 This repo is a test application for creating a TODO api with the [usage](#usage) and [requirements](#requirements) listed below.
 
-The application uses [typescript](https://www.typescriptlang.org/) for both the [Angular](https://angular.io) front end and the [Node.JS](https://nodejs.org) backend.
+It is based on [Node.JS](https://nodejs.org). with [express](https://expressjs.com/) and [typescript](https://www.typescriptlang.org/). For persisting data [DAO pattern](https://www.journaldev.com/16813/dao-design-pattern) for the sake of logic and storage separation, and everything is kept in a json file, under `/src/daos/MockDb/MockDb.json`
 
 ---
 
@@ -34,7 +34,7 @@ yarn start-dev
 
 These are the requirements for the application.
 
-- Creating, reading, updating and deleting To Do items. (done: backend Node|Express|TS - frontend Angular)
+- Creating, reading, updating and deleting To Do items.
 - Each item should have a title, description and a due date. There is no need for a database in the back-end, but you can use one if you want
 
 ```json
@@ -48,13 +48,47 @@ These are the requirements for the application.
 - Sorting and Filtering/Searching for items
 - Pagination and the ability to pre-populate the application with items
 
+For the sake of usability, I have added a `completed` property which indicates wether the specific TODO has been done. On save, a random id is generated for the new entity, thus the final object looks like so:
+
+```json
+{
+  "title": "foo",
+  "description": "bar",
+  "due_date": new Date(),
+  "completed": false,
+  "id": 123415362454
+}
+```
+
+---
+
+## endpoints
+
+The following paths can be accessed in this api:
+
+```
+GET /api/todos/all
+```
+
+```
+POST /api/todos/add
+```
+
+```
+PUT /api/todos/update
+```
+
+```
+DELETE /api/todos/delete/:id
+```
+
 ---
 
 ## testing
 
 Testing is done using jasmine, and the test code can be found under `/spec/Todos.spec.ts`
 
-to run the tests, from the root folder, just run:
+From the root folder, just run:
 
 ```
 yarn test
