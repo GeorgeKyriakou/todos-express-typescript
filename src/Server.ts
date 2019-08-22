@@ -6,9 +6,11 @@ import path from "path";
 import BaseRouter from "./routes";
 
 // Init express
+const cors = require("cors");
 const app = express();
 
 // Add middleware/settings/routes to express.
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

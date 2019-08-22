@@ -23,11 +23,6 @@ jasmine.onComplete((passed: boolean) => {
 
 // Run all or a single unit-test
 if (process.argv[3]) {
-  console.log(
-    ">>>>>>>>>>>>>>>>>>>>>>>>process.argv[3]>>>>>>>>>>>>>>>>>>>>>>>>",
-    process.argv[3]
-  );
-
   const testFile = process.argv[3];
   find.file(testFile + ".spec.ts", "./spec", files => {
     if (files.length === 1) {

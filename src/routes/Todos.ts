@@ -13,7 +13,7 @@ const todosDao = new TodosDao();
 router.get("/all", async (req: Request, res: Response) => {
   try {
     const todos = await todosDao.getAll();
-    return res.status(OK).json({ todos });
+    return res.status(OK).json(todos);
   } catch (err) {
     return res.status(BAD_REQUEST).json({
       error: err.message
@@ -34,7 +34,10 @@ router.post("/add", async (req: Request, res: Response) => {
       });
     }
     await todosDao.add(todo);
-    return res.status(CREATED).end();
+    return res
+      .status(CREATED)
+      .json(todo)
+      .end();
   } catch (err) {
     return res.status(BAD_REQUEST).json({
       error: err.message
@@ -56,7 +59,10 @@ router.put("/update", async (req: Request, res: Response) => {
     }
     todo.id = Number(todo.id);
     await todosDao.update(todo);
-    return res.status(OK).end();
+    return res
+      .status(OK)
+      .json(todo)
+      .end();
   } catch (err) {
     return res.status(BAD_REQUEST).json({
       error: err.message
